@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-untyped-def,union-attr,operator"
+# mypy: disable-error-code="no-untyped-def,operator"
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from reqif.models.reqif_data_type import ReqIFDataTypeDefinitionEnumeration

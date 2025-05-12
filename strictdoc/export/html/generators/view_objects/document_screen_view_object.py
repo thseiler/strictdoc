@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-any-return,no-redef,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-any-return,no-redef,no-untyped-call,no-untyped-def"
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Union
@@ -8,10 +8,14 @@ from markupsafe import Markup
 
 from strictdoc import __version__
 from strictdoc.backend.sdoc.models.document import SDocDocument
-from strictdoc.backend.sdoc.models.document_grammar import GrammarElement
+from strictdoc.backend.sdoc.models.document_grammar import (
+    DocumentGrammar,
+    GrammarElement,
+)
 from strictdoc.backend.sdoc.models.document_view import ViewElement
 from strictdoc.backend.sdoc.models.node import SDocNode, SDocNodeField
 from strictdoc.backend.sdoc.models.section import SDocSection
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.document_tree_iterator import DocumentTreeIterator
 from strictdoc.core.file_tree import File, Folder
 from strictdoc.core.project_config import ProjectConfig
@@ -307,11 +311,13 @@ class DocumentScreenViewObject:
         return datetime.today().strftime("%Y-%m-%d")
 
     def get_document_by_path(self, full_path: str) -> SDocDocument:
+        assert isinstance(self.traceability_index.document_tree, DocumentTree)
         return self.traceability_index.document_tree.get_document_by_path(
             full_path
         )
 
     def get_grammar_elements(self) -> List[GrammarElement]:
+        assert isinstance(self.document.grammar, DocumentGrammar)
         return self.document.grammar.elements
 
     def table_of_contents(self):

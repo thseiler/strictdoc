@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-untyped-call,no-untyped-def,type-arg,union-attr"
+# mypy: disable-error-code="no-untyped-call,no-untyped-def,type-arg"
 import re
 from typing import Dict, List, Tuple, Union
 
@@ -62,6 +62,8 @@ def parse_form_data(form_data: List[Tuple]) -> Dict[str, FormDataDictType]:
 
     for key, value in form_data:
         first_match = re.match(rf"({FIELD_NAME})", key)
+        if first_match is None:
+            raise RuntimeError("Error while parsing formdata")
         match_groups = first_match.groups()
         assert len(match_groups) == 1
 

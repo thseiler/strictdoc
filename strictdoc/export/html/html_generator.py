@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def"
 import os
 from functools import partial
 from pathlib import Path
@@ -7,8 +7,9 @@ from typing import Dict, List, Optional, Tuple
 from html2pdf4doc.html2pdf4doc import PATH_TO_HTML2PDF4DOC_JS
 
 from strictdoc.backend.sdoc.models.document import SDocDocument
-from strictdoc.core.asset_manager import AssetDir
+from strictdoc.core.asset_manager import AssetDir, AssetManager
 from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig, ProjectFeature
 from strictdoc.core.source_tree import SourceTree
 from strictdoc.core.traceability_index import TraceabilityIndex
@@ -90,6 +91,7 @@ class HTMLGenerator:
         # include is provided.
         documents_to_export: List[SDocDocument] = []
 
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         if self.project_config.export_included_documents:
             documents_to_export[:] = (
                 traceability_index.document_tree.document_list
@@ -264,10 +266,13 @@ class HTMLGenerator:
         # Export project's assets.
 
         redundant_assets: Dict[str, List[SDocRelativePath]] = {}
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document_ in traceability_index.document_tree.document_list:
             for (
                 included_document_
             ) in document_.iterate_included_documents_depth_first():
+                assert isinstance(document_.meta, DocumentMeta)
+                assert isinstance(included_document_.meta, DocumentMeta)
                 redundant_assets.setdefault(
                     document_.meta.input_doc_assets_dir_rel_path.relative_path_posix,
                     [],
@@ -277,6 +282,7 @@ class HTMLGenerator:
                 ].append(included_document_.meta.input_doc_assets_dir_rel_path)
 
         asset_dir_: AssetDir
+        assert isinstance(traceability_index.asset_manager, AssetManager)
         for asset_dir_ in traceability_index.asset_manager.iterate():
             source_path = asset_dir_.full_path
             output_relative_path = asset_dir_.relative_path
@@ -319,6 +325,7 @@ class HTMLGenerator:
         if specific_documents is None:
             specific_documents = DocumentType.all()
 
+        assert isinstance(document.meta, DocumentMeta)
         input_doc_full_path = document.meta.input_doc_full_path
         output_doc_full_path = document.meta.output_document_full_path
 
@@ -551,6 +558,7 @@ class HTMLGenerator:
         *,
         traceability_index: TraceabilityIndex,
     ):
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         assert isinstance(
             traceability_index.document_tree.source_tree, SourceTree
         ), traceability_index.document_tree.source_tree

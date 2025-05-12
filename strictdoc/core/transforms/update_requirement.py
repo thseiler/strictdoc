@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-untyped-call,no-untyped-def"
 import datetime
 from copy import copy
 from dataclasses import dataclass
@@ -11,10 +11,17 @@ from strictdoc.backend.sdoc.error_handling import get_textx_syntax_error_message
 from strictdoc.backend.sdoc.free_text_reader import SDFreeTextReader
 from strictdoc.backend.sdoc.models.anchor import Anchor
 from strictdoc.backend.sdoc.models.document import SDocDocument
-from strictdoc.backend.sdoc.models.document_grammar import GrammarElement
+from strictdoc.backend.sdoc.models.document_grammar import (
+    DocumentGrammar,
+    GrammarElement,
+)
 from strictdoc.backend.sdoc.models.free_text import FreeTextContainer
 from strictdoc.backend.sdoc.models.inline_link import InlineLink
-from strictdoc.backend.sdoc.models.model import SDocDocumentIF, SDocSectionIF
+from strictdoc.backend.sdoc.models.model import (
+    SDocDocumentFromFileIF,
+    SDocDocumentIF,
+    SDocSectionIF,
+)
 from strictdoc.backend.sdoc.models.node import SDocNode, SDocNodeField
 from strictdoc.backend.sdoc.models.object_factory import SDocObjectFactory
 from strictdoc.backend.sdoc.models.reference import (
@@ -24,6 +31,8 @@ from strictdoc.backend.sdoc.models.section import SDocSection
 from strictdoc.core.constants import (
     GraphLinkType,
 )
+from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import (
     TraceabilityIndex,
@@ -226,6 +235,10 @@ class CreateOrUpdateNodeCommand:
                         reference_node
                     )
                 else:
+                    assert isinstance(
+                        reference_node.ng_including_document_from_file,
+                        SDocDocumentFromFileIF,
+                    )
                     parent = (
                         reference_node.ng_including_document_from_file.parent
                     )
@@ -239,6 +252,10 @@ class CreateOrUpdateNodeCommand:
             elif self.node_info.whereto == NodeCreationOrder.AFTER:
                 if isinstance(reference_node, SDocDocument):
                     assert reference_node.document_is_included()
+                    assert isinstance(
+                        reference_node.ng_including_document_from_file,
+                        SDocDocumentFromFileIF,
+                    )
                     parent = (
                         reference_node.ng_including_document_from_file.parent
                     )
@@ -258,7 +275,9 @@ class CreateOrUpdateNodeCommand:
                 raise NotImplementedError  # pragma: no cover
 
             # Reset the 'needs generation' flag on all documents.
+            assert isinstance(traceability_index.document_tree, DocumentTree)
             for document_ in traceability_index.document_tree.document_list:
+                assert isinstance(document_.meta, DocumentMeta)
                 set_file_modification_time(
                     document_.meta.input_doc_full_path,
                     datetime.datetime.today(),
@@ -273,6 +292,7 @@ class CreateOrUpdateNodeCommand:
             if document.config.enable_mid:
                 requirement.mid_permanent = True
 
+            assert isinstance(document.grammar, DocumentGrammar)
             grammar_element: GrammarElement = document.grammar.elements_by_type[
                 form_object.element_type
             ]
@@ -310,7 +330,9 @@ class CreateOrUpdateNodeCommand:
         else:
             requirement.relations = []
 
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document_ in traceability_index.document_tree.document_list:
+            assert isinstance(document_.meta, DocumentMeta)
             set_file_modification_time(
                 document_.meta.input_doc_full_path, datetime.datetime.today()
             )
@@ -502,6 +524,7 @@ class CreateOrUpdateNodeCommand:
                     value=requirement_field,
                 )
                 if free_text_content is not None:
+                    assert isinstance(requirement_field, SDocNodeField)
                     for part_ in requirement_field.parts:
                         if isinstance(part_, str):
                             continue

@@ -1,8 +1,10 @@
-# mypy: disable-error-code="no-untyped-def,union-attr"
+# mypy: disable-error-code="no-untyped-def"
 import os
 from pathlib import Path
 from typing import List, Tuple
 
+from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
 from strictdoc.export.html.generators.document_pdf import (
@@ -44,12 +46,14 @@ class HTML2PDFGenerator:
 
         paths_to_print: List[Tuple[str, str]] = []
 
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document_ in traceability_index.document_tree.document_list:
             # Skip generating the included documents, unless the option is provided.
             if not project_config.export_included_documents:
                 if document_.document_is_included():
                     continue
 
+            assert isinstance(document_.meta, DocumentMeta)
             root_path = document_.meta.get_root_path_prefix()
 
             link_renderer = LinkRenderer(

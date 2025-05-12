@@ -17,6 +17,8 @@ from strictdoc.backend.sdoc.models.reference import (
 )
 from strictdoc.backend.sdoc.models.section import SDocSection
 from strictdoc.core.document_iterator import DocumentCachingIterator
+from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.traceability_index import TraceabilityIndex
 from strictdoc.git.change import (
     ChangeType,
@@ -314,6 +316,7 @@ class ChangeStats:
     ):
         assert side in ("left", "right")
 
+        assert isinstance(index.document_tree, DocumentTree)
         for document in index.document_tree.document_list:
             #
             # The included documents are ignored. All their information should
@@ -339,6 +342,7 @@ class ChangeStats:
                         document.reserved_mid
                     ]
                 else:
+                    assert isinstance(document.meta, DocumentMeta)
                     other_document_or_none = (
                         other_stats.map_rel_paths_to_docs.get(
                             document.meta.input_doc_rel_path.relative_path
@@ -911,6 +915,7 @@ class ProjectDiffAnalyzer:
     ) -> ProjectTreeDiffStats:
         document_tree_stats: ProjectTreeDiffStats = ProjectTreeDiffStats()
 
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document in traceability_index.document_tree.document_list:
             if document.document_is_included():
                 continue
@@ -932,6 +937,7 @@ class ProjectDiffAnalyzer:
                 document
             )
 
+        assert isinstance(document.meta, DocumentMeta)
         document_tree_stats.map_rel_paths_to_docs[
             document.meta.input_doc_rel_path.relative_path
         ] = document

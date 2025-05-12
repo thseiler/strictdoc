@@ -13,6 +13,7 @@ class SDocNodeIF(ABC):
     node_type: str
     ng_resolved_custom_level: Optional[str]
     section_contents: List["SDocSectionContentIF"]
+    ng_whitelisted: bool
 
     @abstractmethod
     def is_normative_node(self) -> bool:
@@ -51,6 +52,7 @@ class SDocSectionIF(ABC):
     parent: Union["SDocDocumentIF", "SDocSectionIF"]
     ng_resolved_custom_level: Optional[str]
     section_contents: List["SDocSectionContentIF"]
+    ng_whitelisted: bool
 
     @abstractmethod
     def get_document(self) -> Optional["SDocDocumentIF"]:
@@ -103,6 +105,7 @@ class SDocDocumentIF(ABC):
 class SDocDocumentFromFileIF:
     parent: Union[SDocDocumentIF, SDocSectionIF]
     ng_resolved_custom_level: Optional[str]
+    ng_whitelisted: bool
 
     @abstractmethod
     def has_any_requirements(self) -> bool:

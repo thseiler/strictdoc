@@ -1,9 +1,10 @@
-# mypy: disable-error-code="arg-type,union-attr"
+# mypy: disable-error-code="arg-type"
 from collections import OrderedDict
 from typing import Dict, List, Optional, Set, Tuple
 
 from strictdoc.backend.sdoc.models.document import SDocDocument
 from strictdoc.backend.sdoc.models.document_grammar import (
+    DocumentGrammar,
     GrammarElement,
 )
 from strictdoc.backend.sdoc.models.node import SDocNode, SDocNodeField
@@ -32,6 +33,7 @@ class UpdateGrammarElementCommand:
     def perform(self) -> bool:
         form_object: GrammarElementFormObject = self.form_object
         document: SDocDocument = self.document
+        assert isinstance(document.grammar, DocumentGrammar)
         existing_element: GrammarElement = document.grammar.get_element_by_mid(
             form_object.element_mid
         )

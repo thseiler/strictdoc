@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-any-return,no-untyped-def,type-arg,union-attr,operator"
+# mypy: disable-error-code="arg-type,attr-defined,no-any-return,no-untyped-def,type-arg,operator"
 import json
 import os.path
 from enum import Enum
@@ -19,6 +19,7 @@ from strictdoc.backend.sdoc.models.section import SDocSection
 from strictdoc.backend.sdoc.models.type_system import (
     RequirementFieldType,
 )
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
 
@@ -50,6 +51,7 @@ class JSONGenerator:
             ),
             "DOCUMENTS": [],
         }
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document_ in traceability_index.document_tree.document_list:
             if not project_config.export_included_documents:
                 if document_.document_is_included():
@@ -282,6 +284,7 @@ class JSONGenerator:
         if node.mid_permanent or document.config.enable_mid:
             node_dict["MID"] = node.reserved_mid
 
+        assert isinstance(document.grammar, DocumentGrammar)
         element = document.grammar.elements_by_type[node.node_type]
 
         for element_field in element.fields:

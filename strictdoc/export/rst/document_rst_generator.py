@@ -1,8 +1,10 @@
-# mypy: disable-error-code="no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-untyped-call,no-untyped-def"
 import os
 from pathlib import Path
 
 from strictdoc.backend.sdoc.models.document import SDocDocument
+from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.traceability_index import TraceabilityIndex
 from strictdoc.export.rst.writer import RSTWriter
 
@@ -18,11 +20,13 @@ class DocumentRSTGenerator:
         Path(output_rst_root).mkdir(parents=True, exist_ok=True)
 
         document: SDocDocument
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document in traceability_index.document_tree.document_list:
             document_content = DocumentRSTGenerator.export(
                 document, traceability_index
             )
 
+            assert isinstance(document.meta, DocumentMeta)
             output_folder = os.path.join(
                 output_rst_root,
                 document.meta.input_doc_dir_rel_path.relative_path,

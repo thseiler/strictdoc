@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-redef,no-untyped-call,no-untyped-def,union-attr,type-arg"
+# mypy: disable-error-code="arg-type,attr-defined,no-redef,no-untyped-call,no-untyped-def,type-arg"
 from collections import defaultdict
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Set, Union

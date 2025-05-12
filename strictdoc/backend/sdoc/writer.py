@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def,union-attr,type-arg"
+# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def,type-arg"
 import os.path
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -176,7 +176,10 @@ class SDWriter:
                     output += "\n"
 
             custom_metadata = document_config.custom_metadata
-            if custom_metadata is not None:
+            if (
+                custom_metadata is not None
+                and custom_metadata.entries is not None
+            ):
                 output += "METADATA:"
                 output += "\n"
 
@@ -449,6 +452,7 @@ class SDWriter:
         current_view: ViewElement = document.view.get_current_view(
             self.project_config.view
         )
+        assert isinstance(document.grammar, DocumentGrammar)
         element = document.grammar.elements_by_type[section_content.node_type]
 
         for element_field in element.fields:

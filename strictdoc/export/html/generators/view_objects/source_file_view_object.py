@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-any-return,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-any-return,no-untyped-call,no-untyped-def"
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, List, Optional, Union
@@ -20,6 +20,7 @@ from strictdoc.backend.sdoc_source_code.models.range_marker import (
 from strictdoc.backend.sdoc_source_code.models.source_file_info import (
     SourceFileTraceabilityInfo,
 )
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.document_tree_iterator import DocumentTreeIterator
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.source_tree import SourceFile
@@ -177,6 +178,7 @@ class SourceFileViewObject:
         return datetime.today().strftime("%Y-%m-%d")
 
     def get_document_by_path(self, full_path: str) -> SDocDocument:
+        assert isinstance(self.traceability_index.document_tree, DocumentTree)
         return self.traceability_index.document_tree.get_document_by_path(
             full_path
         )

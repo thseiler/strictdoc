@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def,union-attr,type-arg"
+# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def,type-arg"
 import os.path
 from typing import List, Optional
 
@@ -13,7 +13,11 @@ from strictdoc.backend.sdoc.models.document_grammar import (
     GrammarElement,
 )
 from strictdoc.backend.sdoc.models.document_view import DocumentView
-from strictdoc.backend.sdoc.models.model import SDocDocumentFromFileIF
+from strictdoc.backend.sdoc.models.model import (
+    SDocCompositeNodeIF,
+    SDocDocumentFromFileIF,
+    SDocDocumentIF,
+)
 from strictdoc.backend.sdoc.models.node import (
     SDocCompositeNode,
     SDocNode,
@@ -106,6 +110,7 @@ class SDocParsingProcessor:
             self.parse_context.context_document_reference
         )
 
+        assert isinstance(self.parse_context.document_config, DocumentConfig)
         if self.parse_context.document_config.auto_levels:
             if (
                 section.ng_resolved_custom_level
@@ -163,6 +168,7 @@ class SDocParsingProcessor:
     ):
         self.parse_context.document_has_requirements = True
 
+        assert isinstance(self.parse_context.document_config, DocumentConfig)
         if self.parse_context.document_config.auto_levels:
             if composite_requirement.ng_resolved_custom_level:
                 raise StrictDocException(
@@ -189,7 +195,9 @@ class SDocParsingProcessor:
 
         cursor = composite_requirement.parent
         while (
-            not isinstance(cursor, SDocDocument)
+            not isinstance(cursor, SDocDocumentIF)
+            and not isinstance(cursor, SDocDocumentFromFileIF)
+            and not isinstance(cursor, SDocCompositeNodeIF)
             and not cursor.ng_has_requirements
         ):
             cursor.ng_has_requirements = True
@@ -206,6 +214,7 @@ class SDocParsingProcessor:
     def process_requirement(self, requirement: SDocNode) -> None:
         self.parse_context.document_has_requirements = True
 
+        assert isinstance(self.parse_context.document_config, DocumentConfig)
         if self.parse_context.document_config.auto_levels:
             if requirement.ng_resolved_custom_level:
                 raise StrictDocException(
@@ -232,7 +241,9 @@ class SDocParsingProcessor:
 
         cursor = requirement.parent
         while (
-            not isinstance(cursor, SDocDocument)
+            not isinstance(cursor, SDocDocumentIF)
+            and not isinstance(cursor, SDocDocumentFromFileIF)
+            and not isinstance(cursor, SDocCompositeNodeIF)
             and not cursor.ng_has_requirements
         ):
             cursor.ng_has_requirements = True

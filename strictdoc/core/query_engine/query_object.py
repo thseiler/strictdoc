@@ -1,8 +1,11 @@
-# mypy: disable-error-code="no-any-return,no-untyped-call,no-untyped-def,union-attr,operator"
+# mypy: disable-error-code="no-any-return,no-untyped-call,no-untyped-def,operator"
 from typing import List, Optional
 
 from strictdoc.backend.sdoc.models.document import SDocDocument
-from strictdoc.backend.sdoc.models.document_grammar import GrammarElement
+from strictdoc.backend.sdoc.models.document_grammar import (
+    DocumentGrammar,
+    GrammarElement,
+)
 from strictdoc.backend.sdoc.models.node import SDocNode, SDocNodeField
 from strictdoc.backend.sdoc.models.section import SDocSection
 from strictdoc.core.traceability_index import TraceabilityIndex
@@ -205,11 +208,12 @@ class QueryObject:
             requirement_document: SDocDocument = assert_cast(
                 requirement.get_document(), SDocDocument
             )
-            element: GrammarElement = (
-                requirement_document.grammar.elements_by_type[
-                    requirement.node_type
-                ]
+            grammar: DocumentGrammar = assert_cast(
+                requirement_document.grammar, DocumentGrammar
             )
+            element: GrammarElement = grammar.elements_by_type[
+                requirement.node_type
+            ]
             grammar_field_titles = list(map(lambda f: f.title, element.fields))
             if field_name not in grammar_field_titles:
                 return None

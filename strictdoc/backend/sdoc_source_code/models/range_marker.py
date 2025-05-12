@@ -129,6 +129,7 @@ class ForwardRangeMarker:
 
         # Line number of the marker in the source code.
         self.ng_source_line_begin: Optional[int] = None
+        self.ng_source_column_begin: Optional[int] = None
 
         self.ng_range_line_begin: Optional[int] = None
         self.ng_range_line_end: Optional[int] = None

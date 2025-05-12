@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-untyped-call,no-untyped-def"
 import sys
 
 from strictdoc.backend.sdoc.errors.document_tree_error import DocumentTreeError
@@ -8,6 +8,8 @@ from strictdoc.core.analyzers.document_stats import (
     DocumentTreeStats,
 )
 from strictdoc.core.analyzers.document_uid_analyzer import DocumentUIDAnalyzer
+from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
 from strictdoc.core.traceability_index_builder import TraceabilityIndexBuilder
@@ -69,9 +71,11 @@ class ManageAutoUIDCommand:
                 )
                 next_number += 1
 
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document in traceability_index.document_tree.document_list:
             # Most recently, we parse JUnit XML or Gcov JSON files.
             # These must not be written back.
+            assert isinstance(document.meta, DocumentMeta)
             if not document.meta.document_filename.endswith(".sdoc"):
                 continue
 

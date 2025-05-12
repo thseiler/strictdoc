@@ -46,6 +46,8 @@ from strictdoc.backend.sdoc.models.reference import (
 )
 from strictdoc.backend.sdoc.writer import SDWriter
 from strictdoc.core.document_iterator import DocumentCachingIterator
+from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
 from strictdoc.export.spdx.spdx_sdoc_container import SPDXSDocContainer
@@ -126,6 +128,7 @@ class SDocToSPDXConverter:
 
     @staticmethod
     def create_document_to_file(document: SDocDocument, document_bytes) -> File:
+        assert isinstance(document.meta, DocumentMeta)
         return File(
             spdx_id=f"SPDXRef-File-{get_spdx_ref(document)}",
             name=document.meta.document_filename,
@@ -171,7 +174,8 @@ class SDocToSPDXConverter:
             primary_purpose=SoftwarePurpose.DOCUMENTATION,
             name=f"Requirement '{requirement.reserved_title}'",
             summary=f"SPDX Snippet for requirement {requirement.reserved_uid}",
-            description=requirement.reserved_statement.partition("\n")[0],
+            description=(statement := requirement.reserved_statement)
+            and statement.partition("\n")[0],
             comment=(
                 "This snippet has been generated from a requirement "
                 f"defined in a StrictDoc file: {spdx_file.name}."
@@ -234,7 +238,9 @@ class SPDXGenerator:
         lookup_uid_to_requirement_snippet: Dict[str, Snippet] = {}
         lookup_file_name_to_spdx_file: Dict[str, File] = {}
 
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document_ in traceability_index.document_tree.document_list:
+            assert isinstance(document_.meta, DocumentMeta)
             with open(document_.meta.input_doc_full_path, "rb") as input_file_:
                 document_bytes = input_file_.read()
 

@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-any-return,no-untyped-call,no-untyped-def,union-attr,type-arg"
+# mypy: disable-error-code="arg-type,attr-defined,no-any-return,no-untyped-call,no-untyped-def,type-arg"
 import datetime
 from copy import deepcopy
 from typing import Any, Dict, Generator, List, Optional, Tuple, Union
@@ -76,6 +76,7 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
         Below, making some assumptions about what makes a small or larger
         project.
         """
+        assert isinstance(self.document_tree, DocumentTree)
         if len(self.document_tree.document_list) >= 3:
             return False
         for document_ in self.document_tree.document_list:
@@ -89,6 +90,7 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
         )
 
     def has_requirements(self) -> bool:
+        assert isinstance(self.document_tree, DocumentTree)
         for document_ in self.document_tree.document_list:
             if document_.has_any_requirements():
                 return True
@@ -311,6 +313,7 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
         self, uid: str
     ) -> Union[SDocDocument, SDocSection, SDocNode, None]:
         assert isinstance(uid, str), uid
+        assert isinstance(self.document_tree, DocumentTree)
         for document in self.document_tree.document_list:
             document_iterator = DocumentCachingIterator(document)
             for node in document_iterator.all_content(
@@ -529,6 +532,8 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
         )
 
         # Mark document and parent document (if different) for re-generation.
+        assert isinstance(document.meta, DocumentMeta)
+        assert isinstance(parent_requirement_document.meta, DocumentMeta)
         set_file_modification_time(
             document.meta.input_doc_full_path, datetime.datetime.today()
         )
@@ -600,6 +605,8 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
         )
 
         # Mark document and parent document (if different) for re-generation.
+        assert isinstance(document.meta, DocumentMeta)
+        assert isinstance(child_requirement_document.meta, DocumentMeta)
         set_file_modification_time(
             document.meta.input_doc_full_path, datetime.datetime.today()
         )
@@ -774,6 +781,8 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
             )
 
         # Mark document and parent document (if different) for re-generation.
+        assert isinstance(document.meta, DocumentMeta)
+        assert isinstance(parent_requirement_document.meta, DocumentMeta)
         set_file_modification_time(
             document.meta.input_doc_full_path, datetime.datetime.today()
         )
@@ -822,6 +831,8 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
             )
 
         # Mark document and parent document (if different) for re-generation.
+        assert isinstance(document.meta, DocumentMeta)
+        assert isinstance(child_requirement_document.meta, DocumentMeta)
         set_file_modification_time(
             document.meta.input_doc_full_path, datetime.datetime.today()
         )
@@ -1076,12 +1087,16 @@ class TraceabilityIndex:  # pylint: disable=too-many-public-methods, too-many-in
         traceability_index_copy.document_iterators[bundle_document] = (
             DocumentCachingIterator(bundle_document)
         )
+        assert isinstance(traceability_index_copy.document_tree, DocumentTree)
         for document_ in traceability_index_copy.document_tree.document_list:
             # Ignore all included documents. They are anyway included by
             # the including documents.
             if document_.document_is_included():
                 continue
 
+            assert isinstance(
+                document_.ng_including_document_reference, DocumentReference
+            )
             document_.ng_including_document_reference.set_document(
                 bundle_document
             )

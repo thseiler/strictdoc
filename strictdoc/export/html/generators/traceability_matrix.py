@@ -1,8 +1,9 @@
-# mypy: disable-error-code="arg-type,no-untyped-def,union-attr"
+# mypy: disable-error-code="arg-type,no-untyped-def"
 from typing import Dict, Optional
 
 from strictdoc.backend.sdoc.models.document import SDocDocument
 from strictdoc.backend.sdoc.models.document_grammar import DocumentGrammar
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
 from strictdoc.export.html.generators.view_objects.traceability_matrix_view_object import (
@@ -32,6 +33,7 @@ class TraceabilityMatrixHTMLGenerator:
         discovered_relation_types = set()
 
         document_: SDocDocument
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document_ in traceability_index.document_tree.document_list:
             assert document_.grammar is not None
             document_grammar: DocumentGrammar = document_.grammar

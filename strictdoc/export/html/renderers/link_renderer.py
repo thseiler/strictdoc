@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="arg-type,no-untyped-call,no-untyped-def"
 import html
 from typing import Dict, Optional, Tuple, Union
 
@@ -6,6 +6,7 @@ from strictdoc.backend.sdoc.models.anchor import Anchor
 from strictdoc.backend.sdoc.models.document import SDocDocument
 from strictdoc.backend.sdoc.models.node import SDocNode
 from strictdoc.backend.sdoc.models.section import SDocSection
+from strictdoc.core.document_meta import DocumentMeta
 from strictdoc.core.source_tree import SourceFile
 from strictdoc.export.html.document_type import DocumentType
 from strictdoc.helpers.cast import assert_cast
@@ -94,6 +95,8 @@ class LinkRenderer:
         assert isinstance(
             node, (SDocDocument, SDocNode, SDocSection, Anchor)
         ), node
+        assert isinstance(context_document, SDocDocument)
+        assert isinstance(context_document.meta, DocumentMeta)
 
         if isinstance(node, SDocDocument):
             context_level_or_none = (
@@ -101,6 +104,7 @@ class LinkRenderer:
                 if context_document is not None
                 else None
             )
+            assert isinstance(node.meta, DocumentMeta)
             document_link = node.meta.get_html_link(
                 document_type,
                 context_level_or_none,
@@ -139,6 +143,8 @@ class LinkRenderer:
                 return document_type_cache[node]
         else:
             self.req_link_cache[link_cache_key] = {}
+
+        assert isinstance(node.parent_or_including_document.meta, DocumentMeta)
         document_link = node.parent_or_including_document.meta.get_html_link(
             document_type,
             level,
@@ -157,6 +163,9 @@ class LinkRenderer:
         """
 
         assert isinstance(node, (SDocNode, SDocSection, Anchor)), node
+        assert isinstance(node.parent_or_including_document, SDocDocument)
+        assert isinstance(node.parent_or_including_document.meta, DocumentMeta)
+
         local_link = self.render_local_anchor(node)
         document_link = (
             node.parent_or_including_document.meta.get_html_doc_link()
@@ -177,6 +186,7 @@ class LinkRenderer:
             self.req_link_cache[link_cache_key] = {}
 
         document = assert_cast(node.get_document(), SDocDocument)
+        assert isinstance(document.meta, DocumentMeta)
         document_link = document.meta.get_html_link(
             DocumentType.document(), source_file.level + 1
         )
@@ -189,11 +199,12 @@ class LinkRenderer:
         requirement: SDocNode, requirement_source_path: str
     ):
         assert isinstance(requirement_source_path, str), requirement_source_path
-
         assert requirement.ng_document_reference is not None
+
         document: SDocDocument = assert_cast(
             requirement.ng_document_reference.get_document(), SDocDocument
         )
+        assert isinstance(document.meta, DocumentMeta)
         path_prefix = document.meta.get_root_path_prefix()
         source_file_link = (
             f"{path_prefix}/_source_files/{requirement_source_path}.html"

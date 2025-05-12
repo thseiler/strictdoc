@@ -27,6 +27,7 @@ from strictdoc.backend.sdoc_source_code.caching_reader import (
 )
 from strictdoc.core.document_finder import DocumentFinder
 from strictdoc.core.document_iterator import DocumentCachingIterator
+from strictdoc.core.document_meta import DocumentMeta
 from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.file_dependency_manager import FileDependencyManager
 from strictdoc.core.finders.source_files_finder import (
@@ -175,6 +176,7 @@ class TraceabilityIndexBuilder:
                         node_document = assert_cast(
                             node_.get_document(), SDocDocument
                         )
+                        assert isinstance(node_document.meta, DocumentMeta)
                         traceability_index.file_dependency_manager.add_dependency(
                             source_file.full_path,
                             source_file.output_file_full_path,
@@ -306,6 +308,7 @@ class TraceabilityIndexBuilder:
             #
             # First, resolve all grammars that are imported from grammar files.
             #
+            assert isinstance(document.grammar, DocumentGrammar)
             if document.grammar.import_from_file is not None:
                 document_grammar: Optional[DocumentGrammar] = (
                     document_tree.get_grammar_by_filename(
@@ -378,6 +381,7 @@ class TraceabilityIndexBuilder:
                 print_fragments_from_files=False,
             ):
                 if isinstance(node, SDocNode):
+                    assert isinstance(document.meta, DocumentMeta)
                     try:
                         SDocValidator.validate_node(
                             node,
@@ -554,6 +558,8 @@ class TraceabilityIndexBuilder:
                         parent_document: SDocDocument = assert_cast(
                             parent_requirement.get_document(), SDocDocument
                         )
+                        assert isinstance(document.meta, DocumentMeta)
+                        assert isinstance(parent_document.meta, DocumentMeta)
                         if document != parent_document:
                             # This is where we help the incremental generation to
                             # understand that the related documents must be
@@ -604,6 +610,10 @@ class TraceabilityIndexBuilder:
                             # This is where we help the incremental generation to
                             # understand that the related documents must be
                             # re-generated together.
+                            assert isinstance(document.meta, DocumentMeta)
+                            assert isinstance(
+                                child_requirement_document.meta, DocumentMeta
+                            )
                             file_dependency_manager.add_dependency(
                                 document.meta.input_doc_full_path,
                                 document.meta.output_document_full_path,
@@ -685,6 +695,7 @@ class TraceabilityIndexBuilder:
 
         map_documents_by_input_rel_path: Dict[str, SDocDocument] = {}
         for document_ in document_tree.document_list:
+            assert isinstance(document_.meta, DocumentMeta)
             map_documents_by_input_rel_path[
                 document_.meta.input_doc_full_path
             ] = document_
@@ -780,6 +791,9 @@ class TraceabilityIndexBuilder:
                 print("error: Cannot parse filter query.")  # noqa: T201
                 sys.exit(1)
             try:
+                assert isinstance(
+                    traceability_index.document_tree, DocumentTree
+                )
                 for document in traceability_index.document_tree.document_list:
                     document_iterator = (
                         traceability_index.get_document_iterator(document)

@@ -1,7 +1,8 @@
-# mypy: disable-error-code="no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-untyped-call,no-untyped-def"
 from strictdoc.backend.sdoc.models.node import SDocNode
 from strictdoc.backend.sdoc.models.section import SDocSection
 from strictdoc.core.document_iterator import DocumentCachingIterator
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
 from strictdoc.export.html.generators.view_objects.project_statistics_view_object import (
@@ -24,6 +25,7 @@ class ProgressStatisticsGenerator:
         link_renderer: LinkRenderer,
         html_templates: HTMLTemplates,
     ):
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         git_client = GitClient()
 
         document_tree_stats: DocumentTreeStats = DocumentTreeStats()

@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-any-return,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-any-return,no-untyped-call,no-untyped-def"
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
@@ -7,6 +7,7 @@ from strictdoc import __version__
 from strictdoc.backend.sdoc.models.document import SDocDocument
 from strictdoc.backend.sdoc.models.document_view import DocumentView
 from strictdoc.backend.sdoc.models.model import SDocElementIF
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.document_tree_iterator import DocumentTreeIterator
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
@@ -97,6 +98,7 @@ class SearchScreenViewObject:
         return datetime.today().strftime("%Y-%m-%d")
 
     def get_document_by_path(self, full_path: str):
+        assert isinstance(self.traceability_index.document_tree, DocumentTree)
         return self.traceability_index.document_tree.get_document_by_path(
             full_path
         )

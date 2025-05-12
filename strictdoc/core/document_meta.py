@@ -54,7 +54,7 @@ class DocumentMeta:
         self.level: int = level
         self.file_tree_mount_folder = file_tree_mount_folder
         self.document_filename: str = document_filename
-        self.document_filename_base = document_filename_base
+        self.document_filename_base: str = document_filename_base
         self.input_doc_full_path = input_doc_full_path
         self.input_doc_rel_path: SDocRelativePath = input_doc_rel_path
         self.input_doc_dir_rel_path: SDocRelativePath = input_doc_dir_rel_path

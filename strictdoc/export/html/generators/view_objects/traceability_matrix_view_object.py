@@ -1,9 +1,10 @@
-# mypy: disable-error-code="arg-type,no-any-return,no-untyped-call,no-untyped-def,union-attr,type-arg"
+# mypy: disable-error-code="arg-type,no-any-return,no-untyped-call,no-untyped-def,type-arg"
 from typing import Dict, List, Optional, Tuple
 
 from strictdoc import __version__
 from strictdoc.backend.sdoc.models.document import SDocDocument
 from strictdoc.backend.sdoc.models.document_grammar import DocumentGrammar
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.document_tree_iterator import DocumentTreeIterator
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
@@ -35,6 +36,7 @@ class TraceabilityMatrixViewObject:
         self.strictdoc_version = __version__
 
     def iterate_documents(self):
+        assert isinstance(self.traceability_index.document_tree, DocumentTree)
         yield from filter(
             lambda document_: not document_.document_is_included(),
             self.traceability_index.document_tree.document_list,
@@ -80,6 +82,7 @@ class TraceabilityMatrixHTMLGenerator:
         discovered_relation_types = set()
 
         document_: SDocDocument
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document_ in traceability_index.document_tree.document_list:
             assert document_.grammar is not None
             document_grammar: DocumentGrammar = document_.grammar

@@ -2,7 +2,7 @@
 @relation(SDOC-SRS-99, scope=file)
 """
 
-# mypy: disable-error-code="attr-defined,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="attr-defined,no-untyped-call,no-untyped-def"
 from typing import List, Optional, Union
 
 from strictdoc.backend.sdoc.document_reference import DocumentReference
@@ -11,6 +11,7 @@ from strictdoc.backend.sdoc.models.model import (
     SDocSectionContentIF,
     SDocSectionIF,
 )
+from strictdoc.backend.sdoc.models.node import SDocNode
 from strictdoc.helpers.auto_described import auto_described
 from strictdoc.helpers.cast import assert_cast
 from strictdoc.helpers.mid import MID
@@ -92,29 +93,42 @@ class SDocSection(SDocSectionIF):
         return self.title
 
     def get_document(self) -> Optional[SDocDocumentIF]:
-        return self.ng_document_reference.get_document()
+        if isinstance(self.ng_document_reference, DocumentReference):
+            return self.ng_document_reference.get_document()
+        return None
 
-    def get_including_document(self):
-        return self.ng_including_document_reference.get_document()
+    def get_including_document(self) -> Optional[SDocDocumentIF]:
+        if isinstance(self.ng_including_document_reference, DocumentReference):
+            return self.ng_including_document_reference.get_document()
+        return None
 
     @property
     def parent_or_including_document(self) -> SDocDocumentIF:
-        including_document_or_none = (
-            self.ng_including_document_reference.get_document()
-        )
-        if including_document_or_none is not None:
-            return including_document_or_none
+        if self.ng_including_document_reference is not None:
+            including_document_or_none = (
+                self.ng_including_document_reference.get_document()
+            )
+            if including_document_or_none is not None:
+                return including_document_or_none
 
-        document: Optional[SDocDocumentIF] = (
-            self.ng_document_reference.get_document()
+        if self.ng_document_reference is not None:
+            document: Optional[SDocDocumentIF] = (
+                self.ng_document_reference.get_document()
+            )
+            if document is not None:
+                return document
+        raise RuntimeError(
+            "A valid requirement must always have a reference to the document"
         )
-        assert document is not None, (
-            "A valid requirement must always have a reference to the document."
-        )
-        return document
 
-    def document_is_included(self):
-        return self.ng_including_document_reference.get_document() is not None
+    def document_is_included(self) -> bool:
+        if isinstance(self.ng_including_document_reference, DocumentReference):
+            return (
+                self.ng_including_document_reference.get_document() is not None
+            )
+        raise RuntimeError(
+            "A valid requirement must always have a reference to the document"
+        )
 
     def is_requirement(self):
         return False
@@ -127,7 +141,7 @@ class SDocSection(SDocSectionIF):
 
     def has_any_text_nodes(self):
         return any(
-            node_.__class__.__name__ == "SDocNode" and node_.node_type == "TEXT"
+            isinstance(node_, SDocNode) and node_.node_type == "TEXT"
             for node_ in self.section_contents
         )
 

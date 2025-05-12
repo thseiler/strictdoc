@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="arg-type,no-untyped-call,no-untyped-def"
 from typing import List, Union
 
 from spdx_tools.spdx3.model import RelationshipType, SpdxDocument
@@ -47,6 +47,7 @@ class SPDXToSDocConverter:
         document.config.requirement_style = "Inline"
 
         document.grammar = SPDXToSDocConverter.create_grammar_for_spdx()
+        assert isinstance(document.grammar, DocumentGrammar)
         document.grammar.parent = document
 
         #

@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,no-untyped-def,type-arg,union-attr"
+# mypy: disable-error-code="arg-type,no-untyped-def,type-arg"
 import os
 from pathlib import Path
 from typing import Dict, List
@@ -14,6 +14,8 @@ from strictdoc.backend.sdoc.models.reference import (
     ParentReqReference,
 )
 from strictdoc.backend.sdoc.models.type_system import ReferenceType
+from strictdoc.core.document_meta import DocumentMeta
+from strictdoc.core.document_tree import DocumentTree
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.core.traceability_index import TraceabilityIndex
 
@@ -45,7 +47,9 @@ class ExcelGenerator:
         Path(output_excel_root).mkdir(parents=True, exist_ok=True)
 
         document: SDocDocument
+        assert isinstance(traceability_index.document_tree, DocumentTree)
         for document in traceability_index.document_tree.document_list:
+            assert isinstance(document.meta, DocumentMeta)
             document_out_file_name = (
                 f"{document.meta.document_filename_base}.xlsx"
             )

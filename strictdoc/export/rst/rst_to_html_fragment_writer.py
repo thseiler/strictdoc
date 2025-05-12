@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-redef,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="no-redef,no-untyped-call,no-untyped-def"
 import hashlib
 import io
 import os
@@ -13,6 +13,7 @@ from docutils.utils import SystemMessage
 from markupsafe import Markup
 
 from strictdoc.backend.sdoc.models.document import SDocDocument
+from strictdoc.core.document_meta import DocumentMeta
 from strictdoc.core.project_config import ProjectConfig
 from strictdoc.export.rst.directives.raw_html_role import raw_html_role
 from strictdoc.export.rst.directives.wildcard_enhanced_image import (
@@ -41,6 +42,7 @@ class RstToHtmlFragmentWriter:
         )
 
         if context_document is not None:
+            assert isinstance(context_document.meta, DocumentMeta)
             WildcardEnhancedImage.current_reference_path = (
                 context_document.meta.output_document_dir_full_path
             )

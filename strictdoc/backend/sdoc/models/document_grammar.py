@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-untyped-call,union-attr,type-arg"
+# mypy: disable-error-code="no-untyped-call,type-arg"
 from collections import OrderedDict
 from typing import Dict, Generator, List, Optional, Set, Tuple, Union
 

@@ -1,4 +1,4 @@
-# mypy: disable-error-code="attr-defined,union-attr"
+# mypy: disable-error-code="attr-defined"
 from typing import Optional, Union
 
 from textx import TextXSyntaxError
@@ -28,6 +28,7 @@ from strictdoc.backend.sdoc_source_code.models.range_marker import (
     LineMarker,
     RangeMarker,
 )
+from strictdoc.core.document_meta import DocumentMeta
 
 
 def get_textx_syntax_error_message(exception: TextXSyntaxError) -> str:
@@ -365,6 +366,7 @@ ELEMENTS:
         view_element: ViewElement,
         object_type: str,
     ) -> "StrictDocSemanticError":
+        assert isinstance(document.meta, DocumentMeta)
         return StrictDocSemanticError(
             title=(
                 f"View element '{view_element.view_id}' references a non-existing"
@@ -388,6 +390,7 @@ ELEMENTS:
         object_type: str,
         field_name: str,
     ) -> "StrictDocSemanticError":
+        assert isinstance(document.meta, DocumentMeta)
         return StrictDocSemanticError(
             title=(
                 f"View element '{view_element.view_id}' references a non-existing"
@@ -409,6 +412,8 @@ ELEMENTS:
         document_config: DocumentConfig,
         default_view: str,
     ) -> "StrictDocSemanticError":
+        assert isinstance(document.meta, DocumentMeta)
+
         filename = document.meta.input_doc_full_path
 
         return StrictDocSemanticError(

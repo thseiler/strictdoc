@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,no-any-return,no-untyped-call,no-untyped-def,union-attr,type-arg"
+# mypy: disable-error-code="arg-type,no-any-return,no-untyped-call,no-untyped-def,type-arg"
 from typing import Dict, List, Optional, Set, Tuple, Union
 
 from jinja2 import Template
@@ -173,6 +173,7 @@ class GrammarElementFormObject(ErrorObject):
             )
             form_object_relations.append(form_object_relation)
 
+        assert isinstance(document.grammar, DocumentGrammar)
         element: GrammarElement = document.grammar.get_element_by_mid(
             element_mid
         )

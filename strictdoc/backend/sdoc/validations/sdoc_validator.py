@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,union-attr"
+# mypy: disable-error-code="arg-type"
 import re
 from typing import Iterator, Optional, Set
 
@@ -75,19 +75,20 @@ class SDocValidator:
     def validate_grammar_element(
         path_to_grammar: str, grammar_element: GrammarElement
     ) -> None:
-        # GrammarFromFile doesn't have a parent document.
-        document: Optional[SDocDocument] = assert_optional_cast(
-            grammar_element.parent.parent, SDocDocument
-        )
-        if document is not None and document.config.enable_mid:
-            if (
-                grammar_element.tag != "TEXT"
-                and "MID" not in grammar_element.fields_map
-            ):
-                raise StrictDocSemanticError.grammar_element_has_no_mid_field(
-                    grammar_element,
-                    path_to_grammar,
-                )
+        if grammar_element.parent is not None:
+            # GrammarFromFile doesn't have a parent document.
+            document: Optional[SDocDocument] = assert_optional_cast(
+                grammar_element.parent.parent, SDocDocument
+            )
+            if document is not None and document.config.enable_mid:
+                if (
+                    grammar_element.tag != "TEXT"
+                    and "MID" not in grammar_element.fields_map
+                ):
+                    raise StrictDocSemanticError.grammar_element_has_no_mid_field(
+                        grammar_element,
+                        path_to_grammar,
+                    )
 
     @staticmethod
     def _validate_document_config(document: SDocDocument) -> None:
@@ -113,7 +114,7 @@ class SDocValidator:
     @staticmethod
     def _validate_document_view(document: SDocDocument) -> None:
         document_view: Optional[DocumentView] = document.view
-        if document_view is not None:
+        if document_view is not None and document.grammar is not None:
             for view in document_view.views:
                 for tag in view.tags:
                     if (
@@ -208,7 +209,11 @@ class SDocValidator:
                 break
             if valid_or_not_required_field:
                 # COMMENT can appear multiple times.
-                if requirement_field.field_name == RequirementFieldName.COMMENT:
+                if (
+                    requirement_field is not None
+                    and requirement_field.field_name
+                    == RequirementFieldName.COMMENT
+                ):
                     requirement_field = next(requirement_field_iterator, None)
                     if (
                         requirement_field is not None
@@ -222,8 +227,9 @@ class SDocValidator:
                 grammar_field = next(grammar_fields_iterator, None)
                 requirement_field = next(requirement_field_iterator, None)
             else:
-                assert not grammar_field.required or (
-                    grammar_field.title == "UID" and auto_uid_mode
+                assert grammar_field is not None and (
+                    not grammar_field.required
+                    or (grammar_field.title == "UID" and auto_uid_mode)
                 )
                 grammar_field = next(grammar_fields_iterator, None)
 
