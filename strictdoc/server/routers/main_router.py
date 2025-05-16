@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-redef,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def,union-attr"
 import copy
 import datetime
 import os
@@ -1023,8 +1023,9 @@ def create_main_router(project_config: ProjectConfig) -> APIRouter:
         reference_node = export_action.traceability_index.get_node_by_mid_weak(
             MID(reference_mid)
         )
+        next_uid: str
         if isinstance(reference_node, SDocNode):
-            next_uid: str = document_tree_stats.get_next_requirement_uid(
+            next_uid = document_tree_stats.get_next_requirement_uid(
                 reference_node.get_requirement_prefix()
             )
         elif isinstance(reference_node, SDocSection):
@@ -1032,7 +1033,7 @@ def create_main_router(project_config: ProjectConfig) -> APIRouter:
                 reference_node.get_document(), SDocDocument
             )
             document_acronym = create_safe_acronym(document.title)
-            next_uid: str = document_tree_stats.get_auto_section_uid(
+            next_uid = document_tree_stats.get_auto_section_uid(
                 document_acronym, reference_node
             )
         else:
@@ -1109,6 +1110,8 @@ def create_main_router(project_config: ProjectConfig) -> APIRouter:
 
             update_requirement_command_result_or_none = update_command.perform()
 
+        link_renderer: LinkRenderer
+        markup_renderer: MarkupRenderer
         if form_object.any_errors():
             link_renderer = LinkRenderer(
                 root_path=document.meta.get_root_path_prefix(),
@@ -1161,11 +1164,11 @@ def create_main_router(project_config: ProjectConfig) -> APIRouter:
             specific_documents=(DocumentType.DOCUMENT,),
         )
 
-        link_renderer: LinkRenderer = LinkRenderer(
+        link_renderer = LinkRenderer(
             root_path=document.meta.get_root_path_prefix(),
             static_path=project_config.dir_for_sdoc_assets,
         )
-        markup_renderer: MarkupRenderer = MarkupRenderer.create(
+        markup_renderer = MarkupRenderer.create(
             markup=document.config.get_markup(),
             traceability_index=export_action.traceability_index,
             link_renderer=link_renderer,
@@ -2453,7 +2456,6 @@ def create_main_router(project_config: ProjectConfig) -> APIRouter:
         error_object = ErrorObject()
         assert isinstance(contents, str)
 
-        documents: Optional[List[SDocDocument]] = None
         try:
             reqif_bundle = ReqIFParser.parse_from_string(contents)
             converter: P01_ReqIFToSDocConverter = P01_ReqIFToSDocConverter()

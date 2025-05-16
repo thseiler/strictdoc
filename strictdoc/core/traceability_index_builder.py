@@ -1,4 +1,4 @@
-# mypy: disable-error-code="arg-type,attr-defined,no-redef,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def,union-attr"
 import datetime
 import glob
 import os
@@ -453,9 +453,9 @@ class TraceabilityIndexBuilder:
                     )
 
                 if node.is_requirement():
-                    requirement: SDocNode = assert_cast(node, SDocNode)
-                    if requirement.reserved_tags is not None:
-                        for tag in requirement.reserved_tags:
+                    requirement_node: SDocNode = assert_cast(node, SDocNode)
+                    if requirement_node.reserved_tags is not None:
+                        for tag in requirement_node.reserved_tags:
                             document_tags.setdefault(tag, 0)
                             document_tags[tag] += 1
                     for node_field_ in node.enumerate_fields():
@@ -479,6 +479,8 @@ class TraceabilityIndexBuilder:
 
         # Now iterate over the requirements again to build an in-depth map of
         # parents and children.
+        requirement: SDocNode
+
         for document in document_tree.document_list:
             document_iterator = d_01_document_iterators[document]
 
@@ -489,7 +491,7 @@ class TraceabilityIndexBuilder:
                 if not node.is_requirement():
                     continue
 
-                requirement: SDocNode = node
+                requirement = assert_cast(node, SDocNode)
 
                 #
                 # At this point, we resolve LINKs, and the expectation is that
@@ -630,10 +632,10 @@ class TraceabilityIndexBuilder:
             ):
                 if not node.is_requirement():
                     continue
-                requirement: Union[SDocNode, SDocCompositeNode] = assert_cast(
-                    node, (SDocNode, SDocCompositeNode)
-                )
-                if requirement.reserved_uid is None:
+                possibly_a_composite_requirement: Union[
+                    SDocNode, SDocCompositeNode
+                ] = assert_cast(node, (SDocNode, SDocCompositeNode))
+                if possibly_a_composite_requirement.reserved_uid is None:
                     continue
 
                 # @relation(SDOC-SRS-30, scope=range_start)
@@ -656,7 +658,7 @@ class TraceabilityIndexBuilder:
                     )
 
                 parents_cycle_detector.check_node(
-                    requirement.reserved_uid,
+                    possibly_a_composite_requirement.reserved_uid,
                     parent_cycle_traverse_,
                 )
 
@@ -678,7 +680,7 @@ class TraceabilityIndexBuilder:
                     )
 
                 children_cycle_detector.check_node(
-                    requirement.reserved_uid,
+                    possibly_a_composite_requirement.reserved_uid,
                     child_cycle_traverse_,
                 )
                 # @relation(SDOC-SRS-30, scope=range_end)
