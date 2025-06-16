@@ -21,7 +21,6 @@ def map_does_not_work(self, contents, processing_func):
 import atexit
 import faulthandler
 import multiprocessing
-import os
 import sys
 import traceback
 from abc import ABC, abstractmethod
@@ -90,7 +89,7 @@ class MultiprocessingParallelizer(Parallelizer):
             #        https://github.com/strictdoc-project/strictdoc/issues/2121
             #        Here we enable unbuffered prints to stdout and stderr
             #
-            os.environ["PYTHONUNBUFFERED"] = "1"
+            # os - . environ["PYTHONUNBUFFERED"] = "1"
 
             self.processes = [
                 multiprocessing.Process(
