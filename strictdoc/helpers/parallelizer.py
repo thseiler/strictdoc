@@ -199,7 +199,6 @@ class MultiprocessingParallelizer(Parallelizer):
         #        https://github.com/strictdoc-project/strictdoc/issues/2121
         #        Enable the faulthandler to get stack trace on python interpreter errors
         #
-        #
         faulthandler.enable()
 
         register_code_coverage_hook()
