@@ -91,6 +91,7 @@ class MultiprocessingParallelizer(Parallelizer):
             #        Here we enable unbuffered prints to stdout and stderr
             #
             os.environ["PYTHONUNBUFFERED"] = "1"
+            
 
             self.processes = [
                 multiprocessing.Process(
