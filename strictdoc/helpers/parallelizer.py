@@ -19,12 +19,14 @@ def map_does_not_work(self, contents, processing_func):
 """
 
 import atexit
+import faulthandler
 import multiprocessing
+import subprocess
 import sys
 import traceback
 from abc import ABC, abstractmethod
 from queue import Empty
-from typing import Any, Callable, Iterable, Tuple, Union
+from typing import Any, Callable, Iterable, Optional, Tuple, Union
 
 from strictdoc import environment
 from strictdoc.helpers.coverage import register_code_coverage_hook
@@ -82,6 +84,15 @@ class MultiprocessingParallelizer(Parallelizer):
                 )
                 process_number = fixed_process_number
 
+            #
+            # FIXME: Debugging
+            #        Bug: Process parallelization has become flaky on Windows (rarely) #2121
+            #        https://github.com/strictdoc-project/strictdoc/issues/2121
+            #        Here we enable unbuffered prints to stdout and stderr
+            #
+            # os - . environ["PYTHONUNBUFFERED"] = "1"
+            #
+
             self.processes = [
                 multiprocessing.Process(
                     target=MultiprocessingParallelizer._run,
@@ -123,8 +134,10 @@ class MultiprocessingParallelizer(Parallelizer):
                         f"failed to join within timeout.",
                         flush=True,
                     )
+                    MultiprocessingParallelizer.inspect_with_pyspy(process_.pid)
                     process_.terminate()
                     process_.join()
+                    bad_child_exit_code = True
 
             for process_ in self.processes:
                 if process_.exitcode != 0:
@@ -184,6 +197,14 @@ class MultiprocessingParallelizer(Parallelizer):
         input_queue: "multiprocessing.Queue[Tuple[int, Any, MultiprocessingLambdaType]]",
         output_queue: "multiprocessing.Queue[Tuple[int, Any]]",
     ) -> None:
+        #
+        # FIXME: Debugging:
+        #        Bug: Process parallelization has become flaky on Windows (rarely) #2121
+        #        https://github.com/strictdoc-project/strictdoc/issues/2121
+        #        Enable the faulthandler to get stack trace on python interpreter errors
+        #
+        faulthandler.enable()
+
         register_code_coverage_hook()
 
         def close_queues() -> None:
@@ -217,6 +238,22 @@ class MultiprocessingParallelizer(Parallelizer):
             finally:
                 sys.stdout.flush()
                 sys.stderr.flush()
+
+    @staticmethod
+    def inspect_with_pyspy(pid: Optional[int]) -> None:
+        if pid is not None:
+            try:
+                result = subprocess.run(
+                    ["py-spy", "dump", "--pid", str(pid)],
+                    capture_output=True,
+                    check=True,
+                    text=True,
+                )
+                print(result.stdout)  # noqa: T201
+                if result.stderr:
+                    print("[py-spy stderr]:", result.stderr, file=sys.stderr)  # noqa: T201
+            except Exception as e:
+                print(f"[Error] Failed to run py-spy: {e}")  # noqa: T201
 
 
 class NullParallelizer(Parallelizer):
