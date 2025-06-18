@@ -136,6 +136,7 @@ class MultiprocessingParallelizer(Parallelizer):
                     MultiprocessingParallelizer.inspect_with_pyspy(process_.pid)
                     process_.terminate()
                     process_.join()
+                    bad_child_exit_code = True
 
             for process_ in self.processes:
                 if process_.exitcode != 0:
