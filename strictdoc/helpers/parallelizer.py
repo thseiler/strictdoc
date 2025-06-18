@@ -21,11 +21,12 @@ def map_does_not_work(self, contents, processing_func):
 import atexit
 import faulthandler
 import multiprocessing
+import subprocess
 import sys
 import traceback
 from abc import ABC, abstractmethod
 from queue import Empty
-from typing import Any, Callable, Iterable, Tuple, Union
+from typing import Any, Callable, Iterable, Optional, Tuple, Union
 
 from strictdoc import environment
 from strictdoc.helpers.coverage import register_code_coverage_hook
@@ -132,6 +133,7 @@ class MultiprocessingParallelizer(Parallelizer):
                         f"failed to join within timeout.",
                         flush=True,
                     )
+                    MultiprocessingParallelizer.inspect_with_pyspy(process_.pid)
                     process_.terminate()
                     process_.join()
 
@@ -234,6 +236,22 @@ class MultiprocessingParallelizer(Parallelizer):
             finally:
                 sys.stdout.flush()
                 sys.stderr.flush()
+
+    @staticmethod
+    def inspect_with_pyspy(pid: Optional[int]) -> None:
+        if pid is not None:
+            try:
+                result = subprocess.run(
+                    ["py-spy", "dump", "--pid", str(pid)],
+                    capture_output=True,
+                    check=True,
+                    text=True,
+                )
+                print(result.stdout)  # noqa: T201
+                if result.stderr:
+                    print("[py-spy stderr]:", result.stderr, file=sys.stderr)  # noqa: T201
+            except Exception as e:
+                print(f"[Error] Failed to run py-spy: {e}")  # noqa: T201
 
 
 class NullParallelizer(Parallelizer):

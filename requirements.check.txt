@@ -34,3 +34,6 @@ requests>=2.27.1
 
 # Test HTML2PDF-produced artifacts in the integration tests.
 pypdf
+
+# investigate the stack of child processes when they hang
+py-spy
