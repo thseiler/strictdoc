@@ -965,3 +965,120 @@ RELATIONS:
 [[/SECTION]]
 
 [[/SECTION]]
+
+[[SECTION]]
+MID: 0feab4cce32f44dc85f5dee8a3c934df
+TITLE: Collaborative review comments
+
+[REQUIREMENT]
+MID: 6916661164fd4c7384931aabd8f4edf0
+UID: SDOC-LLR-220
+TITLE: The DISCUSSION: field
+STATEMENT: >>>
+StrictDoc shall define a reserved multi-line field ``DISCUSSION:``. It shall appear as the last field of the node.
+
+The field shall store collaborative review comments and their resolutions.
+
+The field shall be strictly formatted as an YAML-compatible dictionary where:
+
+- the dictionary keys act as anchors
+- A specific span ID key (e.g., ``c-12345:``) anchors the thread to an inline markup span.
+- The reserved generic key ``node:`` anchors the thread to the enclosing requirement or section itself.
+- The dictionary values are unordered lists (using hyphens -) representing individual comments in a thread.
+- continuation lines are indented by exactly 2-spaces
+
+
+EXAMPLE:
+
+.. code ::
+
+    STATEMENT: >>>
+    The system shall shut down [safely]{#c-12345}.
+    <<<
+    DISCUSSION: >>>
+    node:
+
+    - 2023-10-24T10:00:00Z user_C: This entire requirement needs a safety review.
+
+    c-12345:
+
+    - 2023-10-24T10:30:00Z user_A: Should we define "safely"?
+    - 2023-10-25T10:35:22Z user_B: Good point, I will update the statement.
+      I noticed that we use "safely" also in requirement XYZ.
+    - 2023-10-25T:10:39:00Z user_B: [RESOLVED]
+    <<<
+<<<
+RATIONALE: >>>
+The format aligns well with YAML, Markdown, and reStructuredText standard conventions, making it intuitive for users to read and easy for the back-end to parse.
+
+Using the reserved ``node:`` key strictly scopes the comment to the current block, preventing accidentally anchoring comments to wrong nodes when UID are updated manually.
+
+The structure minimizes git merge conflicts, as each new comment is a new line.
+<<<
+
+[REQUIREMENT]
+MID: a689eedb097642b59903bc0da3e8f02f
+UID: SDOC-LLR-221
+TITLE: Inline span markup
+STATEMENT: >>>
+StrictDoc shall support inline span markup within all multi-line text fields (e.g., ``STATEMENT``, ``RATIONALE``) to anchor comment threads to specific text fragments.
+
+The syntax shall follow the attribute extension pattern: ``[marked text]{#thread-id}``.
+
+- ``[marked text]`` defines the text fragment under review
+- ``{#thread-id}`` assigns a unique identifier that shall match a corresponding key in the node's ``DISCUSSION:`` field
+
+During document generation (e.g. PDF, static HTML, Docutils/Sphinx), the rendering engine shall strip the markup and output only the marked text.
+
+In the Web Editor, the engine shall transform the markup into a HTML span to eable highlighting and interaction.
+<<<
+
+[REQUIREMENT]
+MID: 98e68dc5692e4a53b4ae3ccbc66e4e92
+UID: SDOC-LLR-222
+TITLE: Add collaborative comment action
+STATEMENT: >>>
+The StrictDoc Web Editor shall provide an "Add Collaborative Comment" action. Triggering this action shall create an ephemeral UI state, which depend on the user's text selection:
+
+- **Inline comment (text selected):**
+
+  If text is selected within a multi-line node field, the editor shall apply a temporary visual highlight to the selected text, and open a new comment input card in the sidebar.
+
+-  **Node-level comment (no selection):**
+
+   If no text is selected, the editor shall open a new comment input card in the sidebar, bound to the current node.
+
+- **Cancellation:**
+
+  If the user closes the input card without saving, the editor shall discard the UI state and clear the temporary highlight.
+
+- **Saving:**
+
+  If the user closes the input card by clicking save, the editor shall call the save_collaborative_comment endpoint on the backend.
+<<<
+RATIONALE: >>>
+Context-dependent behavior enables both inline and node-level comments through a single interaction, which is intuitive for the user.
+
+Keeping the initialization phase strictly ephemeral prevents the creation of orphaned spans or empty dictionary keys if a user abandons their comment
+<<<
+
+[REQUIREMENT]
+MID: 8c23149460c94f0faa73c4cac7af3e05
+UID: SDOC-LLR-223
+STATEMENT: >>>
+The StrictDoc Web Editor shall provide passive visual indicators for existing discussion threads:
+
+- Inline Thread Visibility: Text bounded by an inline span (e.g., ``[text]{#id}``) shall be rendered with a distinct, low-intrusion style (e.g., a dashed underline) to differentiate it from standard text.
+
+- Node Thread Visibility: Nodes containing a ``node:`` level discussion thread shall display a visual badge (e.g., an icon and comment count) adjacent to the node.
+<<<
+
+[REQUIREMENT]
+MID: 690a6039be0a43f6a687c157ed0144b0
+UID: SDOC-LLR-224
+TITLE: Save collaborative comment endpoint (back-end)
+STATEMENT: >>>
+The StrictDoc server shall provide an ``action/document/save_collaborative_comment`` endpoint, which
+<<<
+
+[[/SECTION]]

@@ -1,0 +1,7 @@
+<turbo-stream action="replace" target="thread-content-{{ node_mid }}-{{ thread_id }}">
+  <template>
+    {% with sdoc_entity = requirement, thread_id = thread_id %}
+      {% include "components/node_field/discussion/thread_popover_content.jinja" %}
+    {% endwith %}
+  </template>
+</turbo-stream>

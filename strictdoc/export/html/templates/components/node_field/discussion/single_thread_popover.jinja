@@ -1,0 +1,18 @@
+{#
+  required variables:
+
+  - thread_id
+  - thread
+  - status
+
+#}
+    {% set status = "resolved" if thread.is_resolved() else "open" %}
+
+    <div id="thread-{{ sdoc_entity.reserved_mid }}-{{ thread_id }}"
+         class="sdoc-thread-popover hidden" 
+         data-thread-id="{{ thread_id }}" 
+         data-thread-status="{{ status }}" 
+         data-controller="comment-popover">
+
+        {% include "components/node_field/discussion/thread_popover_content.jinja" %}
+    </div>  

@@ -28,6 +28,7 @@ from strictdoc.backend.reqif.p01_sdoc.reqif_to_sdoc_converter import (
 from strictdoc.backend.reqif.p01_sdoc.sdoc_to_reqif_converter import (
     P01_SDocToReqIFObjectConverter,
 )
+from strictdoc.backend.sdoc.models.discussion import DiscussionComment, DiscussionParser, DiscussionThread
 from strictdoc.backend.sdoc.models.document import SDocDocument
 from strictdoc.backend.sdoc.models.document_grammar import (
     DocumentGrammar,
@@ -38,6 +39,7 @@ from strictdoc.backend.sdoc.models.grammar_element import (
     RequirementFieldType,
 )
 from strictdoc.backend.sdoc.models.model import (
+    RequirementFieldName,
     SDocExtendedElementIF,
     SDocNodeIF,
 )
@@ -2265,6 +2267,95 @@ def create_main_router(
             },
         )
 
+    @read_router.get(
+        "/actions/document/new_discussion_thread", response_class=Response
+    )
+    def get_new_discussion_thread_form(
+        node_mid: str, thread_id: str = "node"
+    ) -> Response:
+        """
+        Fetches the HTML form for starting a new discussion thread.
+        """
+        output = env().render_template_as_markup(
+            "components/node_field/discussion/new_thread_popover.jinja",
+            node_mid=node_mid,
+            thread_id=thread_id,
+        )
+
+        return HTMLResponse(
+            content=output,
+            status_code=200,
+        )
+
+    @write_router.post(
+        "/actions/document/create_discussion_thread", response_class=Response
+    )
+    def document__add_thread_comment(
+        node_mid: str,
+        request_form_data: FormData = Depends(parse_form_data),
+    ) -> Response:
+        """
+        Handles both starting a new thread and replying to an existing one.
+        """
+        request_dict: Dict[str, str] = dict(request_form_data)
+        thread_id: str = request_dict["thread_id"]
+        comment_body: str = request_dict["comment_body"]
+        current_user="thseiler"
+
+        if not comment_body or not comment_body.strip():
+            return Response(status_code=204)
+
+        requirement: SDocNode = export_action.traceability_index.get_node_by_mid(
+            MID(node_mid)
+        )
+        document: SDocDocument = assert_cast(requirement.get_document(), SDocDocument)
+
+        # Grab the current discussion dictionary
+        current_threads = requirement.parsed_discussion or {}
+
+        new_comment = DiscussionComment.create_new(user=current_user, body=comment_body)
+
+        if thread_id not in current_threads:
+            current_threads[thread_id] = DiscussionThread(thread_id)
+
+        current_threads[thread_id].comments.append(new_comment)
+
+        # Serialize the dictionary back to the raw SDoc string format
+        updated_discussion_string = DiscussionParser.serialize(current_threads)
+
+        # Update the AST Node!
+        requirement.set_field_value(
+            field_name=RequirementFieldName.DISCUSSION,
+            form_field_index=0, # Discussion is typically a single multi-line field
+            value=updated_discussion_string,
+        )
+
+        # Save to disk and regenerate the HTML export
+        write_document_to_file(document)
+
+        html_generator.export_single_document_with_performance(
+            document=document,
+            traceability_index=export_action.traceability_index,
+            specific_documents=(DocumentType.DOCUMENT,),
+        )
+
+        output = env().render_template_as_markup(
+            "actions/document/discussion/stream_updated_discussion.jinja.html",
+            node_mid=node_mid,
+            requirement=requirement,
+            thread_id=thread_id,
+            thread=current_threads[thread_id],
+            is_not_standalone=True,
+        )
+
+        return HTMLResponse(
+            content=output,
+            status_code=200,
+            headers={
+                "Content-Type": "text/vnd.turbo-stream.html",
+            },
+        )
+
     @router.get("/export_html2pdf/{document_mid}", response_class=Response)
     def get_export_html2pdf(document_mid: str) -> Response:  # noqa: ARG001
         if not project_config.is_activated_html2pdf():
@@ -2509,6 +2600,9 @@ def create_main_router(
             content=output,
             status_code=200,
         )
+
+
+
 
     @read_router.get("/autocomplete/uid", response_class=Response)
     def get_autocomplete_uid_results(

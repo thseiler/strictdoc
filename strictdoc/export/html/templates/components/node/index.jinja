@@ -66,5 +66,11 @@
     {% include "components/node/node_controls/index.jinja" %}
     {%- endif -%}
 
+    {# discussion threads (collaborative review comments) #}
+    {%- if is_not_standalone -%}
+    {% include "components/node_field/discussion/all_thread_popovers.jinja" %}
+    {%- endif -%}
+
   </sdoc-node>
+
 </turbo-frame>

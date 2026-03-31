@@ -1,0 +1,28 @@
+<div class="sdoc-thread-popover hidden" 
+     data-thread-id="{{ thread_id }}" 
+     data-thread-status="open" 
+     data-controller="comment-popover">
+  
+  <header class="sdoc-thread-header">
+    <span class="sdoc-thread-badge sdoc-thread-badge-open">New Discussion</span>
+    <button data-action="click->comment-popover#close" style="background: none; border: none; cursor: pointer; color: #888; padding: 4px;" title="Close">
+      <svg width="12" height="12" viewBox="0 0 16 16"><path d="M2,2 L14,14 M14,2 L2,14" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </button>
+  </header>
+
+  <div class="sdoc-thread-messages">
+    <div style="padding: 16px; text-align: center; color: #888; font-size: 0.9em; font-style: italic;">
+      No comments yet. Start the conversation!
+    </div>
+  </div>
+
+  <form action="/actions/document/create_discussion_thread?node_mid={{ node_mid }}" method="POST" data-turbo="true">
+    <input type="hidden" name="thread_id" value="{{ thread_id }}">
+    
+    <textarea name="comment_body" placeholder="Add a comment..." rows="2" style="width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
+    
+    <div style="display: flex; justify-content: flex-end;">
+      <button type="submit" class="action_button">Comment</button>
+    </div>
+  </form>
+</div>

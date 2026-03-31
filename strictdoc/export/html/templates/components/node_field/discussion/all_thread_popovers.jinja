@@ -1,0 +1,12 @@
+{#
+  required variables:
+
+  - sdoc_entity
+
+#}
+
+{% if sdoc_entity.parsed_discussion is defined and sdoc_entity.parsed_discussion %}
+  {% for thread_id, thread in sdoc_entity.parsed_discussion.items() %}
+    {% include "components/node_field/discussion/single_thread_popover.jinja" %}
+  {% endfor %}
+{% endif %}

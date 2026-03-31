@@ -395,6 +395,87 @@ This is a Rationale line 3
         "This is a Rationale line 3\n"
     )
 
+def test_038_discussion_on_node(default_project_config):
+    input_sdoc = """
+[DOCUMENT]
+TITLE: Test Doc
+
+[[SECTION]]
+TITLE: Test Section
+
+[REQUIREMENT]
+STATEMENT: Some statement
+DISCUSSION: >>>
+node:
+
+- 2023-10-24T10:00:00Z user_A: This entire requirement needs
+  a safety review.
+<<<
+
+[[/SECTION]]
+""".lstrip()
+
+    reader = SDReader()
+
+    document = reader.read(input_sdoc)
+    assert isinstance(document, SDocDocument)
+
+    writer = SDWriter(default_project_config)
+    output = writer.write(document)
+
+    assert input_sdoc == output
+    assert isinstance(
+        document.section_contents[0].section_contents[0], SDocNode
+    )
+    requirement_1 = document.section_contents[0].section_contents[0]
+    assert requirement_1.discussion == (
+        "node:\n"
+        "\n"
+        "- 2023-10-24T10:00:00Z user_A: This entire requirement needs\n"
+        "  a safety review.\n"
+    )
+
+def test_039_discussion_on_section(default_project_config):
+    input_sdoc = """
+[DOCUMENT]
+TITLE: Test Doc
+
+[[SECTION]]
+TITLE: Test Section
+DISCUSSION: >>>
+node:
+
+- 2023-10-24T10:00:00Z user_A: This entire section needs a safety review.
+<<<
+
+[REQUIREMENT]
+STATEMENT: Some statement
+
+[[/SECTION]]
+""".lstrip()
+
+    reader = SDReader()
+
+    document = reader.read(input_sdoc)
+    assert isinstance(document, SDocDocument)
+
+    writer = SDWriter(default_project_config)
+    output = writer.write(document)
+
+    assert input_sdoc == output
+    assert isinstance(
+        document.section_contents[0].section_contents[0], SDocNode
+    )
+    section_node = document.section_contents[0]
+    assert section_node.node_type == "SECTION"
+    assert section_node.is_composite is True
+    assert section_node.reserved_title == "Test Section"
+
+    assert section_node.discussion == (
+        "node:\n"
+        "\n"
+        "- 2023-10-24T10:00:00Z user_A: This entire section needs a safety review.\n"
+    )
 
 # This test is needed to make sure that the grammar details related
 # to the difference of parting single vs multiline strings are covered.

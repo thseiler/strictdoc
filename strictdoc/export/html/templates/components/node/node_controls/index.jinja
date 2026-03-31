@@ -223,6 +223,19 @@
       </menu>
     </sdoc-menu-list>
   </sdoc-menu>
+  
+  {# DISCUSSION: discussion thread popover #}
+  <a class="action_button" 
+     href="/actions/document/new_discussion_thread?node_mid={{ sdoc_entity.reserved_mid }}&thread_id=node"
+     title="Add Node Comment" 
+     data-testid="node-discuss-action"
+     data-controller="inline-comment"
+     data-action="click->inline-comment#open"
+     data-thread-id="node"
+     style="cursor: pointer;">{% include "_res/svg_ico16_add_comment.jinja.html" %}</a>
+
   {%- endif -%}
+
+ 
 
 </sdoc-node-controls>

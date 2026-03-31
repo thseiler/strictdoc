@@ -1,0 +1,13 @@
+# This test ensures that:
+# - DISCUSSIONS Feature is disabled by default
+# - Any existing projects with have a DISCUSSION field work as expected.
+
+RUN: %strictdoc export %S --output-dir %T | filecheck %s --dump-input=fail
+CHECK: Published: Discussion Basic Test
+
+RUN: %cat %T/html/01_discussion_basic/index.html | filecheck %s --dump-input=fail --check-prefix CHECK-HTML
+CHECK-HTML: Discussion Basic Test
+CHECK-HTML: index.sdoc
+CHECK-HTML-NOT: <sdoc-node-field-label>DISCUSSION:</sdoc-node-field-label>
+CHECK-HTML-NOT: <li>2023-10-24T10:00:00Z user_A: A comment.</li>
+CHECK-HTML: <span class="comment-highlight" data-controller="inline-comment" data-action="click->inline-comment#open" data-thread-id="123">ipsum</span>

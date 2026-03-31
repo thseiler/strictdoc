@@ -18,6 +18,7 @@ from pygments.lexers import _load_lexers
 
 from strictdoc.backend.sdoc.models.document import SDocDocument
 from strictdoc.core.project_config import ProjectConfig, ProjectFeature
+from strictdoc.export.rst.directives.comment_role import comment_role
 from strictdoc.export.rst.directives.raw_html_role import raw_html_role
 from strictdoc.export.rst.directives.sphinx_style_math import (
     MathDirective,
@@ -38,6 +39,7 @@ class RstToHtmlFragmentWriter:
     directives.register_directive("image", WildcardEnhancedImage)
 
     roles.register_local_role("rawhtml", raw_html_role)
+    roles.register_local_role("comment", comment_role)
 
     # FIXME: It doesn't feel right to load lexers like this.
     _load_lexers("strictdoc.export.rst.strictdoc_lexer")

@@ -1,0 +1,82 @@
+[DOCUMENT]
+TITLE: Discussion Basic Test
+UID: DOC-UID
+
+[REQUIREMENT]
+UID: REQ-1
+TITLE: filler 1
+STATEMENT: >>>
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+so we can scroll
+<<<
+RATIONALE: >>>
+we need to test scrolling
+<<<
+DISCUSSION: >>>
+node:
+
+- 2026-04-09T08:29:25+00:00 thseiler: test
+  can span two lines
+  or three
+- 2026-04-09T11:23:24+00:00 thseiler: and here is a reply
+- 2026-04-09T11:58:06+00:00 thseiler: here is a new comment
+- 2026-04-09T12:01:31+00:00 thseiler: another comment
+- 2026-04-09T12:01:51+00:00 thseiler: another comment
+- 2026-04-09T12:06:53+00:00 thseiler: and again
+- 2026-04-09T12:09:29+00:00 thseiler: and one more
+- 2026-04-09T12:15:44+00:00 thseiler: this does not work
+- 2026-04-09T12:19:29+00:00 thseiler: newcomment
+<<<
+
+[REQUIREMENT]
+UID: RRQ-1
+TITLE: Requirement in root
+STATEMENT: >>>
+lorem :comment:`ipsum<123>`
+<<<
+DISCUSSION: >>>
+node:
+
+- 2023-10-24T10:00:00Z user_A: A general comment.
+
+123:
+
+- 2023-10-24T10:00:00Z user_B: What does this mean?
+<<<
+
+[REQUIREMENT]
+UID: REQ-2
+TITLE: filler 2
+STATEMENT: >>>
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+
+This a filler requiremnt
+
+so we can scroll
+<<<
+RATIONALE: >>>
+we need to test scrolling
+<<<

@@ -76,6 +76,8 @@ class ProjectFeature(str, Enum):
     RAPIDOC = "RAPIDOC"
     NESTOR = "NESTOR"
 
+    DISCUSSIONS = "DISCUSSIONS"
+
     ALL_FEATURES = "ALL_FEATURES"
 
     @staticmethod

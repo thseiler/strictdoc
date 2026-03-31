@@ -33,6 +33,8 @@ class RequirementFieldName:
     RATIONALE = "RATIONALE"
     COMMENT = "COMMENT"
 
+    DISCUSSION = "DISCUSSION"
+
 
 RESERVED_NON_META_FIELDS = [
     RequirementFieldName.TITLE,
@@ -42,6 +44,7 @@ RESERVED_NON_META_FIELDS = [
     RequirementFieldName.COMMENT,
     RequirementFieldName.RATIONALE,
     RequirementFieldName.LEVEL,
+    RequirementFieldName.DISCUSSION
 ]
 
 

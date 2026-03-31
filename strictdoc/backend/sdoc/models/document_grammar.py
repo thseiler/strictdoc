@@ -118,6 +118,12 @@ class DocumentGrammar(SDocGrammarIF):
                     human_title=None,
                     required="False",
                 ),
+                GrammarElementFieldString(
+                    parent=None,
+                    title=RequirementFieldName.DISCUSSION,
+                    human_title=None,
+                    required="False",
+                ),
             ]
         )
 
@@ -326,6 +332,12 @@ class DocumentGrammar(SDocGrammarIF):
                     human_title=None,
                     required="True",
                 ),
+                GrammarElementFieldString(
+                    parent=None,
+                    title=RequirementFieldName.DISCUSSION,
+                    human_title=None,
+                    required="False",
+                ),
             ]
         )
         text_element = GrammarElement(
@@ -383,6 +395,14 @@ class DocumentGrammar(SDocGrammarIF):
                 title=RequirementFieldName.TITLE,
                 human_title=None,
                 required="True",
+            ),
+        )
+        fields.append(
+            GrammarElementFieldString(
+                parent=None,
+                title=RequirementFieldName.DISCUSSION,
+                human_title=None,
+                required="False",
             ),
         )
         section_element = GrammarElement(

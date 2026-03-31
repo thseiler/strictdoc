@@ -1,0 +1,52 @@
+{#
+  required variables:
+
+  - thread_id
+  - thread
+  - status
+
+#}
+    {% set status = "resolved" if thread.is_resolved() else "open" %}
+    <div id="thread-content-{{ sdoc_entity.reserved_mid }}-{{ thread_id }}" style="display: contents;">
+
+      <header class="sdoc-thread-header">
+        <span class="sdoc-thread-badge sdoc-thread-badge-{{ status }}">
+          {{ status | capitalize }}
+        </span>
+        
+        <button data-action="click->comment-popover#close" style="background: none; border: none; cursor: pointer; color: #888; padding: 4px;" title="Close">
+          <svg width="12" height="12" viewBox="0 0 16 16">
+            <path d="M2,2 L14,14 M14,2 L2,14" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="sdoc-thread-messages" data-controller="comment-autoscroll">
+        {% for comment in thread.comments %}
+          <div class="sdoc-message">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85em;">
+              <strong>{{ comment.user }}</strong>
+              <span style="color: #888;" title="{{ comment.timestamp_str }}">
+                {{ comment.parsed_datetime.strftime('%b %d, %I:%M %p') }}
+              </span>
+            </div>
+            <div style="font-size: 0.95em; line-height: 1.4; margin: 0;">
+              {{ comment.body }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {# Only show the reply form in the web editor #}
+      {% if is_not_standalone %}
+        <form action="/actions/document/create_discussion_thread?node_mid={{ sdoc_entity.reserved_mid }}" method="POST" data-turbo="true">
+          <input type="hidden" name="thread_id" value="{{ thread_id }}">
+
+          <textarea name="comment_body" placeholder="Reply..." rows="2" style="width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
+          
+          <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="action_button">Reply</button>
+          </div>
+        </form>
+      {% endif %}
+    </div>
