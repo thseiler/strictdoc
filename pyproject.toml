@@ -149,4 +149,3 @@ enable = [
 disable = [
     "fixit.rules"
 ]
-
