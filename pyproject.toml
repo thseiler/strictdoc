@@ -98,7 +98,9 @@ dependencies = [
     "WebSockets",
 
     # HTML2PDF dependencies
-    "html2pdf4doc == 0.0.31",
+    #"html2pdf4doc == 0.0.31",
+    # we use the patched version with the retry loop for testing of this changes something...
+    "html2pdf4doc @ git+https://github.com/thseiler/html2pdf4doc.git@54fbc5f3c85bb1873f3d70fe2a20080bc364c68a",
     "pypdf >= 6.5.0, == 6.*",
 
     # Robot Framework dependencies
